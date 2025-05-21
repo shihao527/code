@@ -1,0 +1,4 @@
+/Users/shiha/Desktop/C/upd/build/CMakeFiles/sender.dir
+/Users/shiha/Desktop/C/upd/build/CMakeFiles/receiver.dir
+/Users/shiha/Desktop/C/upd/build/CMakeFiles/edit_cache.dir
+/Users/shiha/Desktop/C/upd/build/CMakeFiles/rebuild_cache.dir
