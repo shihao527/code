@@ -6,8 +6,8 @@
 #include <stdint.h>
 
 
-#define THREAD_POOL_SIZE 8  // Number of worker threads (adjust based on CPU cores)
-#define TASK_QUEUE_SIZE 5 // Max tasks in queue (adjust based on load)
+#define THREAD_POOL_SIZE 8 
+#define TASK_QUEUE_SIZE 5 
 
 struct task {
     struct conn_table *ct;
@@ -17,16 +17,16 @@ struct task {
 };
 
 struct thread_pool {
-    pthread_t *threads;          // Array of worker threads
-    struct task *queue;         // Task queue
-    int queue_size;             // Max queue size
-    int task_count;             // Current number of tasks
-    int head;                   // Queue head (next task to process)
-    int tail;                   // Queue tail (where to add tasks)
-    pthread_mutex_t mutex;      // Mutex for queue access
-    pthread_cond_t not_empty;   // Condition for non-empty queue
-    pthread_cond_t not_full;    // Condition for non-full queue
-    int shutdown;               // Flag to shut down pool
+    pthread_t *threads;          
+    struct task *queue;         
+    int queue_size;             
+    int task_count;             
+    int head;                   
+    int tail;                   
+    pthread_mutex_t mutex;      
+    pthread_cond_t not_empty;   
+    pthread_cond_t not_full;    
+    int shutdown;               
 };
 
 
