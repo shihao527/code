@@ -11,6 +11,7 @@
 #include <errno.h>
 #include "fd_queued.h"
 #include <fcntl.h>
+const char *message = "-ERR Rate Limit\r\n"
 void handle_client(struct conn_table *ct, int client_fd, const char *ip, uint16_t port)
 {
     struct conn_entry *entry = ct_get(ct, ip, port);
@@ -23,7 +24,7 @@ void handle_client(struct conn_table *ct, int client_fd, const char *ip, uint16_
     time_t now = time(NULL);
     if (entry->request_count > 50 && difftime(now, entry->last_request) < 60)
     {
-        send(client_fd, "-ERR Rate Limit\r\n", 17, 0);
+        send(client_fd, message, strlen(message), 0);
         close(client_fd);
         ct_remove(ct, ip, port);
         return;
@@ -34,24 +35,20 @@ void handle_client(struct conn_table *ct, int client_fd, const char *ip, uint16_
     while (1)
     {
         int n = recv(client_fd, buffer, sizeof(buffer) - 1, 0);
-        printf("retrun code %d", n);
         if (n > 0)
         {
-
-            printf("server received %d", client_fd);
             buffer[n] = '\0';
             entry->request_count++;
             entry->last_request = now;
-            if (send(client_fd, "+OK\r\n", 5, 0) < 0)
+            if (send(client_fd, "+OK\r\n", strlen("+OK\r\n"), 0) < 0)
             {
-
-                printf("send error");
+   
                 break;
-            } // Echo response
+            } 
         }
         else if (n == 0)
         {
-            printf("dis\n");
+         
             close(client_fd);
             remove_queued_fd(client_fd);
 
@@ -60,12 +57,11 @@ void handle_client(struct conn_table *ct, int client_fd, const char *ip, uint16_
         else if (errno == EAGAIN || errno == EWOULDBLOCK)
         {
 
-            printf("no more data");
             break;
         }
         else
         {
-            printf("received failed");
+ 
             close(client_fd);
             remove_queued_fd(client_fd);
         }
@@ -93,7 +89,7 @@ int main()
     int opt = 1;
     setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
     struct sockaddr_in server_addr = {.sin_family = AF_INET, .sin_port = htons(53031), .sin_addr.s_addr = INADDR_ANY};
-    printf("Server starting...\n");
+
     if (bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
         perror("bind");
@@ -125,7 +121,7 @@ int main()
         return 1;
     }
 
-    printf("binding \n");
+    
     struct thread_pool *pool = thread_pool_create(THREAD_POOL_SIZE, TASK_QUEUE_SIZE);
 
     if (!pool)
@@ -144,7 +140,6 @@ int main()
             perror("epoll_wait");
             break;
         }
-        printf("number of nfds %d\n", nfds);
         for (int i = 0; i < nfds; i++)
         {
 
@@ -154,7 +149,7 @@ int main()
             {
                 // Accept new client
                 int client_fd = accept(server_fd, NULL, NULL);
-                printf("new client %d\n", client_fd);
+             
                 if (client_fd < 0)
                 {
                     perror("accept");
@@ -175,7 +170,7 @@ int main()
 
                 if (events[i].events & (EPOLLERR | EPOLLHUP))
                 {
-                    printf("Client %d disconnected or error\n", fd);
+             
                     close(fd);
                     epoll_ctl(epoll_fd, EPOLL_CTL_DEL, fd, NULL); // Clean up epoll
                     remove_queued_fd(fd);
@@ -204,7 +199,7 @@ int main()
                         }
                         else
                         {
-                            fprintf(stderr, "getpeername failed %s (errno: %d)\n", strerror(errno), errno);
+                            
                             perror("getpeername");
                             remove_queued_fd(fd);
                         }

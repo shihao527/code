@@ -7,13 +7,13 @@
 #include <arpa/inet.h>
 #include <errno.h>
 
-#define SERVER_IP "192.168.1.166" // Replace with your server IP
-#define SERVER_PORT 53031         // Server port
-#define BUFFER_SIZE 1024          // Buffer size for send/receive
-#define NUM_CONNECTIONS 500       // Number of connections to create
-#define BASE_PORT 32767           // Start of ephemeral port range
+#define SERVER_IP "192.168.1.166" 
+#define SERVER_PORT 53031         
+#define BUFFER_SIZE 1024          
+#define NUM_CONNECTIONS 500       
+#define BASE_PORT 32767          
 
-// Client connection function
+
 int sockets[3];
 int handle_connection(int source_port)
 {
@@ -22,7 +22,6 @@ int handle_connection(int source_port)
     char buffer[BUFFER_SIZE];
     const char *message = "Hello, Server!\n";
     int bytes_sent, bytes_received;
-    printf("create socket");
     // Create socket
     sock_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (sock_fd < 0)
@@ -32,7 +31,7 @@ int handle_connection(int source_port)
     }
     int opt = 1;
     setsockopt(sock_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
-    printf("bind");
+
     // Bind to specific source port
     client_addr.sin_family = AF_INET;
     client_addr.sin_port = htons(source_port);
@@ -54,7 +53,7 @@ int handle_connection(int source_port)
         return -1;
     }
 
-    printf("start connection");
+
     // Connect to server
     if (connect(sock_fd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
     {
@@ -73,8 +72,6 @@ int handle_connection(int source_port)
         close(sock_fd);
         return -1;
     }
-    printf("Sent to server from port %d: %s", source_port, message);
-
     // Receive response from server
     bytes_received = recv(sock_fd, buffer, BUFFER_SIZE - 1, 0);
     if (bytes_received < 0)
@@ -96,11 +93,9 @@ int handle_connection(int source_port)
 
 int main()
 {
-    // Create multiple connections with different source ports
-    printf("start\n");
+    // Create multiple connections to the server
     for (int i = 0; i < 3; i++)
     {
-        printf("yes\n");
         int source_port = BASE_PORT + i;
         sockets[i] = handle_connection(source_port);
         printf("number %d", i);
@@ -109,6 +104,7 @@ int main()
     char *mesage = "ping !";
     close(sockets[0]);
     close(sockets[2]);
+    // Use the second socket for testing rate limiting
     for (int j = 0; j < 150; j++)
     {
 
@@ -139,6 +135,7 @@ int main()
     {
         /* code */
     }
+    close(sockets[1]);
 
     return 0;
 }
